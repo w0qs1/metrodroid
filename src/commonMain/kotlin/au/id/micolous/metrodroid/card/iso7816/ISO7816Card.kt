@@ -35,7 +35,7 @@ import au.id.micolous.metrodroid.card.china.ChinaCard
 import au.id.micolous.metrodroid.card.emv.EmvFactory
 import au.id.micolous.metrodroid.card.ksx6924.KROCAPConfigDFApplication
 import au.id.micolous.metrodroid.card.ksx6924.KSX6924Application
-import au.id.micolous.metrodroid.card.ncmc.NcmcFactory
+import au.id.micolous.metrodroid.card.ncmc.NcmcApplication
 import au.id.micolous.metrodroid.multi.Localizer
 import au.id.micolous.metrodroid.multi.Log
 import au.id.micolous.metrodroid.multi.R
@@ -59,7 +59,7 @@ val factories = listOf(
     KROCAPConfigDFApplication.FACTORY,
     KSX6924Application.FACTORY,
     ChinaCard.FACTORY,
-    NcmcFactory(),
+    NcmcApplication.FACTORY,
     EmvFactory())
 
 object ISO7816AppSerializer : MultiTypeSerializer<ISO7816Application>() {
@@ -183,6 +183,7 @@ data class ISO7816Card (
                     for (appId in factory.applicationNames) {
                         if (coreNFC && appId in BeijingTransitData.FACTORY.appNames)
                           continue
+                        
                         val appFci = iso7816Tag.selectByNameOrNull(appId) ?: continue
 
                         val app = factory.dumpTag(

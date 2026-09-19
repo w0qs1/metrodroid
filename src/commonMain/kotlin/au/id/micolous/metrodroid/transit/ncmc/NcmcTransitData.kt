@@ -1,12 +1,11 @@
 package au.id.micolous.metrodroid.transit.ncmc
 
 import au.id.micolous.metrodroid.multi.Parcelize
+import au.id.micolous.metrodroid.card.CardType
 import au.id.micolous.metrodroid.card.ncmc.NcmcParser
 import au.id.micolous.metrodroid.card.ncmc.NcmcPendingEntry
-import au.id.micolous.metrodroid.transit.TransitBalance
-import au.id.micolous.metrodroid.transit.TransitCurrency
-import au.id.micolous.metrodroid.transit.TransitData
-import au.id.micolous.metrodroid.transit.Trip
+import au.id.micolous.metrodroid.transit.*
+import au.id.micolous.metrodroid.multi.*
 import au.id.micolous.metrodroid.ui.ListItem
 
 @Parcelize
@@ -74,5 +73,15 @@ class NcmcTransitData(
 
         return (transactionTrips + listOfNotNull(pendingEntryTrip))
             .sortedWith(Trip.Comparator())
+    }
+    companion object {
+        val CARD_INFO = CardInfo(
+            imageId = R.drawable.ncmc,
+            name = "RuPay NCMC",
+            cardType = CardType.ISO7816,
+            locationId = R.string.location_india,
+            region = TransitRegion.INDIA,
+            preview = true
+        )
     }
 }

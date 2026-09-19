@@ -8,7 +8,10 @@ import au.id.micolous.metrodroid.card.iso7816.ISO7816Protocol
 import au.id.micolous.metrodroid.card.iso7816.ISO7816TLV
 import au.id.micolous.metrodroid.transit.ncmc.NcmcEntry
 import au.id.micolous.metrodroid.transit.ncmc.NcmcTransaction
+import au.id.micolous.metrodroid.transit.ncmc.NcmcTransitData
 import au.id.micolous.metrodroid.multi.Log
+import au.id.micolous.metrodroid.multi.Localizer
+import au.id.micolous.metrodroid.multi.R
 import au.id.micolous.metrodroid.util.ImmutableByteArray
 import kotlinx.serialization.KSerializer
 import kotlinx.datetime.Clock
@@ -51,7 +54,7 @@ class NcmcFactory : ISO7816ApplicationFactory {
      * Do not stop processing other registered application factories.
      */
     override val stopAfterFirstApp: Boolean
-        get() = false
+        get() = true
 
     override val fixedAppIds: Boolean
         get() = true
@@ -69,6 +72,15 @@ class NcmcFactory : ISO7816ApplicationFactory {
         presentAids: List<ImmutableByteArray?>
     ): List<ISO7816Application>? {
 
+        feedbackInterface.updateStatusText(
+            Localizer.localizeString(
+                R.string.card_reading_type,
+                NcmcTransitData.CARD_INFO.name
+            )
+        )
+
+        feedbackInterface.showCardType(NcmcTransitData.CARD_INFO)
+        
         Log.d(TAG, "Starting NCMC application processing")
 
         /*

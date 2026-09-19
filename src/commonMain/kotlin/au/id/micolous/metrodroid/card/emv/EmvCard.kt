@@ -52,9 +52,6 @@ private const val PIN_RETRY = 0x9f17
 private const val TYPE_MAIN = "emv-main"
 private const val TYPE_ANCHOR = "emv-anchor"
 
-private val NCMC_AID = 
-    ImmutableByteArray.fromHex("A0000005241010");
-
 @Serializable
 class EmvCard(override val generic: ISO7816ApplicationCapsule) : ISO7816Application() {
     override val type: String
@@ -164,14 +161,6 @@ class EmvFactory : ISO7816ApplicationFactory {
         if (discretionaryData != null) {
             for (appInfo in ISO7816TLV.findRepeatedBERTLV(discretionaryData, "61", true)) {
                 val aid = ISO7816TLV.findBERTLV(appInfo, "4f", false) ?: continue
-
-                // NCMC is handled by NcmcFactory.
-                // Prevent EMV from creating a duplication application.
-                if (aid == NCMC_AID) {
-                    Log.d(TAG, "EMV: Skipping NCMC AID=$aid")
-                    continue
-                }
-                Log.d(TAG, "EMV: MAN=$aid")
 
                 val mainAppFci = protocol.selectByNameOrNull(aid)
                 val mainAppCapsule = ISO7816ApplicationMutableCapsule(appFci = mainAppFci,

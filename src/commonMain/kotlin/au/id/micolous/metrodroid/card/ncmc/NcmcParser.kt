@@ -10,7 +10,7 @@ import au.id.micolous.metrodroid.multi.Log
 
 object NcmcParser {
 
-    private val TZ = MetroTimeZone("Asia/Kolkata")
+    private val TZ = MetroTimeZone.INDIA
 
     private const val DF33_HEADER_LENGTH = 32
     private const val CSA_LENGTH = 96

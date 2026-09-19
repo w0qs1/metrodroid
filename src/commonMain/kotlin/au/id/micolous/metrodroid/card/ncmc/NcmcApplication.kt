@@ -3,6 +3,7 @@ package au.id.micolous.metrodroid.card.ncmc
 import au.id.micolous.metrodroid.card.iso7816.ISO7816Application
 import au.id.micolous.metrodroid.card.iso7816.ISO7816ApplicationCapsule
 import au.id.micolous.metrodroid.card.iso7816.ISO7816Card
+import au.id.micolous.metrodroid.card.iso7816.ISO7816ApplicationFactory
 import au.id.micolous.metrodroid.transit.TransitData
 import au.id.micolous.metrodroid.transit.TransitIdentity
 import au.id.micolous.metrodroid.transit.ncmc.NcmcTransitData
@@ -109,5 +110,6 @@ data class NcmcApplication(
 
     companion object {
         const val TYPE = "ncmc"
+        val FACTORY: ISO7816ApplicationFactory = NcmcFactory()
     }
 }
