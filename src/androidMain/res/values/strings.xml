@@ -2805,4 +2805,12 @@
     <!-- Translators: Smartrider fare class, time-limited ticket for those
     attending a special event. -->
     <string name="smartrider_fare_convention">Convention Pass</string>
+
+    <!--NCMC-->
+    <string name="ncmc_card_info">NCMC Card Information</string>
+    <string name="ncmc_pan">PAN</string>
+    <string name="ncmc_version">NCMC Version</string>
+    <string name="ncmc_language">Preferred Language</string>
+    <string name="ncmc_effective_date">Effective Date</string>
+    <string name="ncmc_atc">Application Transaction Counter</string>
 </resources>
