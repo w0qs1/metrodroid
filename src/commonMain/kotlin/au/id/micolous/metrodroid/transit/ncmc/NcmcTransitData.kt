@@ -32,7 +32,7 @@ class NcmcTransitData(
     }
 
     override val cardName: String
-        get() = "RuPay NCMC"
+        get() = Localizer.localizeString(R.string.card_name_ncmc)
 
     override val info: List<ListItem>?
         get() = null
@@ -77,11 +77,10 @@ class NcmcTransitData(
     companion object {
         val CARD_INFO = CardInfo(
             imageId = R.drawable.ncmc,
-            name = "RuPay NCMC",
+            name = R.string.card_name_ncmc,
             cardType = CardType.ISO7816,
             locationId = R.string.location_india,
-            region = TransitRegion.INDIA,
-            preview = true
+            region = TransitRegion.INDIA
         )
     }
 }

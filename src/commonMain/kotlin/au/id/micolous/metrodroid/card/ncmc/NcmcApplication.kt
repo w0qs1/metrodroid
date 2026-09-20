@@ -29,13 +29,13 @@ data class NcmcPendingEntry(
 data class NcmcApplication(
     override val generic: ISO7816ApplicationCapsule,
     val pan: String? = null,
+    val cardAtc: Long? = null,
     val balancePaise: Long? = null,
     val effectiveDate: String? = null,
     val transactions: List<NcmcTransaction> = emptyList(),
     val ncmcVersion: String? = null,
     val cardLanguage: String? = null,
     val expiryDate: String? = null,
-    val cardAtc: Long? = null,
     val pendingEntry: NcmcPendingEntry? = null
 ) : ISO7816Application() {
 

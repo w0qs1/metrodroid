@@ -2,6 +2,8 @@ package au.id.micolous.metrodroid.transit.ncmc
 
 import au.id.micolous.metrodroid.card.ncmc.NcmcApplication
 import au.id.micolous.metrodroid.card.ncmc.NcmcCardTransitFactory
+import au.id.micolous.metrodroid.multi.R
+import au.id.micolous.metrodroid.multi.Localizer
 import au.id.micolous.metrodroid.transit.TransitData
 import au.id.micolous.metrodroid.transit.TransitIdentity
 
@@ -15,7 +17,7 @@ object NCMCTransitFactory : NcmcCardTransitFactory {
         card: NcmcApplication
     ): TransitIdentity? {
         return TransitIdentity(
-            name = "RuPay NCMC",
+            name = Localizer.localizeString(R.string.card_name_ncmc),
             serialNumber = card.pan
         )
     }

@@ -2808,7 +2808,7 @@
     <string name="smartrider_fare_convention">Convention Pass</string>
 
     <!--NCMC-->
-    <string name="card_name_ncmc">NCMC</string>
+    <string name="card_name_ncmc">RuPay NCMC</string>
     <string name="ncmc_card_info">NCMC Card Information</string>
     <string name="ncmc_pan">PAN</string>
     <string name="ncmc_version">NCMC Version</string>

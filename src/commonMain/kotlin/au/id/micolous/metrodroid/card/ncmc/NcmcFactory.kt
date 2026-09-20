@@ -29,10 +29,6 @@ class NcmcFactory : ISO7816ApplicationFactory {
         val cardType: String? = null
     )
 
-    private data class Sfi16Metadata(
-        val atc: Long? = null
-    )
-
     data class Sfi16Result(
         val transactions: List<NcmcTransaction>,
         val pendingEntry: NcmcPendingEntry?
@@ -54,7 +50,7 @@ class NcmcFactory : ISO7816ApplicationFactory {
      * Do not stop processing other registered application factories.
      */
     override val stopAfterFirstApp: Boolean
-        get() = true
+        get() = false
 
     override val fixedAppIds: Boolean
         get() = true
@@ -80,6 +76,14 @@ class NcmcFactory : ISO7816ApplicationFactory {
         )
 
         feedbackInterface.showCardType(NcmcTransitData.CARD_INFO)
+
+        feedbackInterface.updateProgressBar(0, 35)
+
+        val cardAtc = findAtc(protocol)
+
+        Log.d(TAG, "ATC Found: ${cardAtc ?: "Undefined"}")
+
+        feedbackInterface.updateProgressBar(1, 35)
         
         Log.d(TAG, "Starting NCMC application processing")
 
@@ -118,6 +122,12 @@ class NcmcFactory : ISO7816ApplicationFactory {
         )
 
         Log.d(TAG, "DF33 value: ${df33 ?: "NOT FOUND"}")
+
+        if (df33 == null) {
+            Log.d(TAG, "Not an NCMC card")
+
+            return null
+        }
         
         val balancePaise = df33?.let {
             NcmcParser.parseDf33Balance(it)
@@ -126,9 +136,6 @@ class NcmcFactory : ISO7816ApplicationFactory {
         val ncmcMetadata = df33?.let {
             parseNcmcMetadataFromDf33(it)
         } ?: NcmcMetadata()
-
-
-        val sfi16Metadata = findSfi16Metadata(protocol)
 
         Log.d(TAG, "Parsed balancePaise: $balancePaise")
 
@@ -139,13 +146,13 @@ class NcmcFactory : ISO7816ApplicationFactory {
          * The existing capsule implementation reads SFI 1..31.
          * This also allows us to inspect records for PAN tags 5A/57.
          */
-        feedbackInterface.updateProgressBar(0, 32)
+        feedbackInterface.updateProgressBar(2, 35)
 
         capsule.dumpAllSfis(
             protocol = protocol,
             feedbackInterface = feedbackInterface,
-            start = 0,
-            total = 32
+            start = 2,
+            total = 35
         )
 
         /*
@@ -214,22 +221,19 @@ class NcmcFactory : ISO7816ApplicationFactory {
 
         val transactions = transactionMap.values.toList()
 
-        Log.d(
-            TAG,
-            "Parsed NCMC transactions: ${transactions.size}"
-        )
+        feedbackInterface.updateProgressBar(35, 35)
 
         return listOf(
             NcmcApplication(
                 generic = capsule.freeze(),
                 pan = pan,
+                cardAtc = cardAtc,
                 effectiveDate = effectiveDate,
                 balancePaise = balancePaise,
                 transactions = transactions,
                 ncmcVersion = ncmcMetadata.version,
                 cardLanguage = ncmcMetadata.cardLanguage,
                 expiryDate = expiryDate,
-                cardAtc = sfi16Metadata.atc,
                 pendingEntry = sfi16Result.pendingEntry
             )
         )
@@ -275,6 +279,52 @@ class NcmcFactory : ISO7816ApplicationFactory {
             "FF01" +             // DF16 (2)
             "3132333435363738"   // 9F1C (8)
         )
+    }
+
+    private fun findAtc(
+        protocol: ISO7816Protocol
+    ): Long? {
+
+        val response = try {
+            protocol.sendRequest(
+                ISO7816Protocol.CLASS_80,
+                0xCA.toByte(),
+                0x9F.toByte(),
+                0x36.toByte(),
+                0
+            )
+        } catch (e: Exception) {
+            Log.d(TAG, "ATC READ DATA failed: ${e.message}")
+            return null
+        }
+
+        // Expected response: 9F 36 02 XX YY
+        if (response.size < 5) {
+            Log.d(
+                TAG,
+                "ATC response too short: ${response.toHexString()}"
+            )
+            return null
+        }
+
+        if (response[0].toInt() and 0xFF != 0x9F ||
+            response[1].toInt() and 0xFF != 0x36 ||
+            response[2].toInt() and 0xFF != 0x02
+        ) {
+            Log.d(
+                TAG,
+                "Unexpected ATC response: ${response.toHexString()}"
+            )
+            return null
+        }
+
+        val atc =
+            ((response[3].toInt() and 0xFF) shl 8) or
+            (response[4].toInt() and 0xFF)
+
+        Log.d(TAG, "ATC retrieved using READ DATA: $atc")
+
+        return atc.toLong()
     }
 
     private fun findPan(
@@ -415,40 +465,6 @@ class NcmcFactory : ISO7816ApplicationFactory {
         return NcmcMetadata(
             version = version,
             cardLanguage = language
-        )
-    }
-
-    private fun findSfi16Metadata(
-        protocol: ISO7816Protocol
-    ): Sfi16Metadata {
-
-        val record = try {
-            protocol.readRecord(
-                sfi = 16,
-                recordNumber = 1,
-                length = 0
-            )
-        } catch (e: Exception) {
-            Log.d(TAG, "Failed to read SFI16 record 1", e)
-            return Sfi16Metadata()
-        } ?: run {
-            Log.d(TAG, "SFI16 record 1 not found")
-            return Sfi16Metadata()
-        }
-
-        if (record.size < 16) {
-            Log.d(TAG, "SFI16 record 1 is too short: ${record.size}")
-            return Sfi16Metadata()
-        }
-
-        val atc =
-            ((record[14].toInt() and 0xFF) shl 8) or
-            (record[15].toInt() and 0xFF)
-
-        Log.d(TAG, "SFI16 ATC: $atc")
-
-        return Sfi16Metadata(
-            atc = atc.toLong()
         )
     }
 
