@@ -161,6 +161,7 @@ class EmvFactory : ISO7816ApplicationFactory {
         if (discretionaryData != null) {
             for (appInfo in ISO7816TLV.findRepeatedBERTLV(discretionaryData, "61", true)) {
                 val aid = ISO7816TLV.findBERTLV(appInfo, "4f", false) ?: continue
+                Log.d(TAG, "EMV: MAN=$aid")
 
                 val mainAppFci = protocol.selectByNameOrNull(aid)
                 val mainAppCapsule = ISO7816ApplicationMutableCapsule(appFci = mainAppFci,
