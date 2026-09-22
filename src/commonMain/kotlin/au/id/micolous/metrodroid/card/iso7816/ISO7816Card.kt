@@ -183,7 +183,6 @@ data class ISO7816Card (
                     for (appId in factory.applicationNames) {
                         if (coreNFC && appId in BeijingTransitData.FACTORY.appNames)
                           continue
-                        
                         val appFci = iso7816Tag.selectByNameOrNull(appId) ?: continue
 
                         val app = factory.dumpTag(
